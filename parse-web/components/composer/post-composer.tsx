@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { savePostDraft, publishPost } from "@/app/actions/posts";
+import { publishPost } from "@/app/actions/posts";
 import { validateWordCount } from "@/domains/posts/posts.validation";
 import { ptSerif } from "@/app/fonts";
 import { cn } from "@/lib/utils";
@@ -36,7 +36,7 @@ export function PostComposer({ username }: { username: string }) {
   // Redirect to feed after successful publish
   useEffect(() => {
     if (publishState?.success && !publishState.data?.isDraft) {
-      router.push('/');
+      router.push("/");
     }
   }, [publishState, router]);
 
@@ -48,7 +48,6 @@ export function PostComposer({ username }: { username: string }) {
             id="title"
             name="title"
             placeholder="Your new post"
-            disabled={isLoading}
             className="border-none shadow-none text-4xl! font-extrabold"
           />
           <span className="italic text-muted-foreground text-sm ml-4">
@@ -64,7 +63,6 @@ export function PostComposer({ username }: { username: string }) {
             rows={8}
             value={content}
             onChange={handleContentChange}
-            disabled={isLoading}
             required
             className={cn(
               "my-5 text-lg! border-none shadow-none ",
@@ -96,7 +94,9 @@ export function PostComposer({ username }: { username: string }) {
           <Button
             type="submit"
             formAction={publishAction}
-            disabled={isPublishPending || !wordCountStatus.isValid || !content.trim()}
+            disabled={
+              isPublishPending || !wordCountStatus.isValid || !content.trim()
+            }
           >
             {isPublishPending ? "Publishing..." : "Publish"}
           </Button>
