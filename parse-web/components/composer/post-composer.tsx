@@ -4,15 +4,16 @@ import { useActionState, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { publishPost } from "@/app/actions/posts";
 import { validateWordCount } from "@/domains/posts/posts.validation";
 import { ptSerif } from "@/app/fonts";
 import { cn } from "@/lib/utils";
+import MarkdownEditor from "../MarkdownEditor";
 
 type FormState = {
   success: boolean;
   error?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
 } | null;
 
@@ -27,8 +28,7 @@ export function PostComposer({ username }: { username: string }) {
     FormData
   >(publishPost, null);
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
+  const handleContentChange = (newContent: string) => {
     setContent(newContent);
     setWordCountStatus(validateWordCount(newContent));
   };
@@ -56,20 +56,17 @@ export function PostComposer({ username }: { username: string }) {
         </div>
 
         <div className="space-y-2">
-          <Textarea
-            id="content"
-            name="content"
-            placeholder="Share your thoughts..."
-            rows={8}
+          <MarkdownEditor
             value={content}
             onChange={handleContentChange}
-            required
+            placeholder="Share your thoughts..."
             className={cn(
-              "my-5 text-lg! border-none shadow-none ",
+              "my-5 text-lg border-none shadow-none",
               ptSerif.className,
               !wordCountStatus.isValid ? "border-destructive" : ""
             )}
           />
+          <input type="hidden" name="content" value={content} />
         </div>
 
         {/* Hidden fields */}
