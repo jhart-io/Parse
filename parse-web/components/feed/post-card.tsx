@@ -4,6 +4,7 @@ import { ptSerif } from "@/app/fonts";
 import { PostWithAuthor } from "@/domains/posts/posts.types";
 import { cn } from "@/lib/utils";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Pencil, MoreHorizontal, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -97,7 +98,7 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
           )}
         </div>
         <div className={cn("my-5 text-lg", ptSerif.className)}>
-          <Markdown>{post.content}</Markdown>
+          <Markdown remarkPlugins={[remarkGfm]}>{post.content}</Markdown>
         </div>
       </article>
 
