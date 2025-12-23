@@ -1,8 +1,10 @@
 import { getPosts } from "@/app/actions/posts";
+import { getCurrentUser } from "@/domains/auth/auth.service";
 import { PostCard } from "./post-card";
 
 export async function PostFeed() {
   const result = await getPosts();
+  const currentUser = await getCurrentUser();
 
   if (!result.success || !result.data) {
     return (
@@ -27,7 +29,7 @@ export async function PostFeed() {
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} post={post} currentUserId={currentUser?.personId} />
       ))}
     </div>
   );

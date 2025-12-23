@@ -65,3 +65,54 @@ export async function getDraftsByAuthor(authorId: string): Promise<PostWithAutho
 
   return result as PostWithAuthor[];
 }
+
+/**
+ * Get a post by ID with author information
+ */
+export async function getPostById(postId: string): Promise<PostWithAuthor | null> {
+  const result = await db.query.posts.findFirst({
+    where: eq(posts.id, postId),
+    with: {
+      author: true,
+    },
+  });
+
+  return result as PostWithAuthor | null;
+}
+
+/**
+ * Update an existing post
+ */
+export async function updatePost(
+  postId: string,
+  data: {
+    title?: string;
+    content?: string;
+    isDraft?: boolean;
+    visibility?: 'public' | 'followers' | 'private';
+    topic?: string;
+  }
+) {
+  const [updatedPost] = await db
+    .update(posts)
+    .set({
+      ...data,
+      lastModifiedAt: new Date(),
+    })
+    .where(eq(posts.id, postId))
+    .returning();
+
+  return updatedPost;
+}
+
+/**
+ * Delete a post by ID
+ */
+export async function deletePost(postId: string) {
+  const [deletedPost] = await db
+    .delete(posts)
+    .where(eq(posts.id, postId))
+    .returning();
+
+  return deletedPost;
+}

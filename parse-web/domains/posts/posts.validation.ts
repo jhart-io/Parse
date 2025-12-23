@@ -28,6 +28,20 @@ export const createPostSchema = z.object({
 
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 
+// Update post schema (all fields optional since partial updates are allowed)
+export const updatePostSchema = z.object({
+  title: z.string()
+    .min(1, 'Title is required')
+    .max(200, 'Title must be 200 characters or less')
+    .optional(),
+  content: postContentSchema.optional(),
+  isDraft: z.boolean().optional(),
+  visibility: z.enum(['public', 'followers', 'private']).optional(),
+  topic: z.string().max(50).optional(),
+});
+
+export type UpdatePostInput = z.infer<typeof updatePostSchema>;
+
 // For client-side validation feedback
 export const validateWordCount = (content: string): {
   isValid: boolean;
