@@ -1,8 +1,8 @@
-import { db } from '@/db';
-import { posts } from '@/db/schema';
-import { createPostSchema } from './posts.validation';
-import { PostWithAuthor } from './posts.types';
-import { eq, desc } from 'drizzle-orm';
+import { db } from "@/db";
+import { posts } from "@/db/schema";
+import { createPostSchema } from "./posts.validation";
+import { PostWithAuthor } from "./posts.types";
+import { eq, desc } from "drizzle-orm";
 
 /**
  * Create a new post
@@ -12,21 +12,24 @@ export async function createPost(data: {
   title?: string;
   content: string;
   isDraft: boolean;
-  visibility: 'public' | 'followers' | 'private';
+  visibility: "public" | "followers" | "private";
   topic?: string;
 }) {
   // Validate input (this will transform title to "Untitled" if empty)
   const validated = createPostSchema.parse(data);
 
   // Insert post
-  const [post] = await db.insert(posts).values({
-    authorId: data.authorId,
-    title: validated.title,
-    content: validated.content,
-    isDraft: validated.isDraft,
-    visibility: validated.visibility,
-    topic: validated.topic,
-  }).returning();
+  const [post] = await db
+    .insert(posts)
+    .values({
+      authorId: data.authorId,
+      title: validated.title,
+      content: validated.content,
+      isDraft: validated.isDraft,
+      visibility: validated.visibility,
+      topic: validated.topic,
+    })
+    .returning();
 
   return post;
 }
@@ -34,7 +37,10 @@ export async function createPost(data: {
 /**
  * Get all published posts with author information
  */
-export async function getPublishedPosts(options?: { limit?: number; offset?: number }): Promise<PostWithAuthor[]> {
+export async function getPublishedPosts(options?: {
+  limit?: number;
+  offset?: number;
+}): Promise<PostWithAuthor[]> {
   const result = await db.query.posts.findMany({
     where: eq(posts.isDraft, false),
     with: {
@@ -51,12 +57,12 @@ export async function getPublishedPosts(options?: { limit?: number; offset?: num
 /**
  * Get draft posts by author
  */
-export async function getDraftsByAuthor(authorId: string): Promise<PostWithAuthor[]> {
+export async function getDraftsByAuthor(
+  authorId: string
+): Promise<PostWithAuthor[]> {
   const result = await db.query.posts.findMany({
-    where: (posts, { eq, and }) => and(
-      eq(posts.authorId, authorId),
-      eq(posts.isDraft, true)
-    ),
+    where: (posts, { eq, and }) =>
+      and(eq(posts.authorId, authorId), eq(posts.isDraft, true)),
     with: {
       author: true,
     },
@@ -67,9 +73,29 @@ export async function getDraftsByAuthor(authorId: string): Promise<PostWithAutho
 }
 
 /**
+ * Get published posts by author
+ */
+export async function getPublishedPostsByAuthor(
+  authorId: string
+): Promise<PostWithAuthor[]> {
+  const result = await db.query.posts.findMany({
+    where: (posts, { eq, and }) =>
+      and(eq(posts.authorId, authorId), eq(posts.isDraft, false)),
+    with: {
+      author: true,
+    },
+    orderBy: [desc(posts.createdAt)],
+  });
+
+  return result as PostWithAuthor[];
+}
+
+/**
  * Get a post by ID with author information
  */
-export async function getPostById(postId: string): Promise<PostWithAuthor | null> {
+export async function getPostById(
+  postId: string
+): Promise<PostWithAuthor | null> {
   const result = await db.query.posts.findFirst({
     where: eq(posts.id, postId),
     with: {
@@ -89,7 +115,7 @@ export async function updatePost(
     title?: string;
     content?: string;
     isDraft?: boolean;
-    visibility?: 'public' | 'followers' | 'private';
+    visibility?: "public" | "followers" | "private";
     topic?: string;
   }
 ) {

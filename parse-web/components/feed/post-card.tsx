@@ -1,6 +1,14 @@
 "use client";
 
 import { ptSerif } from "@/app/fonts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 import { PostWithAuthor } from "@/domains/posts/posts.types";
 import { cn } from "@/lib/utils";
 import Markdown from "react-markdown";
@@ -73,7 +81,14 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
           <div className="flex-1">
             <h2 className="text-4xl font-extrabold">{post.title}</h2>
             <span className="italic text-muted-foreground text-sm">
-              By @{post.author.username} on {formattedDate}
+              By{" "}
+              <Link
+                href={`/people/${post.author.username}`}
+                className="font-semibold hover:underline"
+              >
+                @{post.author.username}
+              </Link>{" "}
+              on {formattedDate}
             </span>
           </div>
           {isOwner && (
